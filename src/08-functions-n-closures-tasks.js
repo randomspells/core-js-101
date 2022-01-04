@@ -8,7 +8,6 @@
  *                                                                                             *
  ********************************************************************************************* */
 
-
 /**
  * Returns the functions composition of two specified functions f(x) and g(x).
  * The result of compose is to be a function of one argument, (lets call the argument x),
@@ -57,10 +56,12 @@ const getPowerFunction = (exponent) => (args) => args ** exponent;
  *   getPolynom(8)     => y = 8
  *   getPolynom()      => null
  */
-function getPolynom() {
-  throw new Error('Not implemented');
+function getPolynom(...args) {
+  while (args.length < 3) {
+    args.unshift(0);
+  }
+  return (x) => args[0] * x ** 2 + args[1] * x + args[2];
 }
-
 
 /**
  * Memoizes passed function and returns function
@@ -101,8 +102,16 @@ function memoize(func) {
  * }, 2);
  * retryer() => 2
  */
-function retry(/* func, attempts */) {
-  throw new Error('Not implemented');
+function retry(func, attempts) {
+  let tries = attempts;
+  while (tries > 1) {
+    try {
+      func();
+    } catch (e) {
+      tries -= 1;
+    }
+  }
+  return () => func();
 }
 
 
@@ -129,10 +138,15 @@ function retry(/* func, attempts */) {
  * cos(3.141592653589793) ends
  *
  */
-function logger(/* func, logFunc */) {
-  throw new Error('Not implemented');
+function logger(func, logFunc) {
+  return (...args) => {
+    const stringified = JSON.stringify(args).slice(1, -1);
+    logFunc(`${func.name}(${stringified}) starts`);
+    const result = func.apply(this, args);
+    logFunc(`${func.name}(${stringified}) ends`);
+    return result;
+  };
 }
-
 
 /**
  * Return the function with partial applied arguments
@@ -147,10 +161,9 @@ function logger(/* func, logFunc */) {
  *   partialUsingArguments(fn, 'a','b','c')('d') => 'abcd'
  *   partialUsingArguments(fn, 'a','b','c','d')() => 'abcd'
  */
-function partialUsingArguments(/* fn, ...args1 */) {
-  throw new Error('Not implemented');
+function partialUsingArguments(fn, ...args1) {
+  return (...args2) => fn.apply(this, args1.concat(args2));
 }
-
 
 /**
  * Returns the id generator function that returns next integer starting
@@ -169,10 +182,18 @@ function partialUsingArguments(/* fn, ...args1 */) {
  *   getId4() => 7
  *   getId10() => 11
  */
-function getIdGeneratorFunction(/* startFrom */) {
-  throw new Error('Not implemented');
+function getIdGeneratorFunction(startFrom) {
+  let start = startFrom;
+  let firstTime = true;
+  return () => {
+    if (firstTime) {
+      firstTime = false;
+      return start;
+    }
+    start += 1;
+    return start;
+  };
 }
-
 
 module.exports = {
   getComposition,
